@@ -45,12 +45,14 @@ public class MyLinkedList<E> implements List<E> {
 	
 	private int size;            // keeps track of the number of elements
 	private Node head;           // reference to the first node
+	private Node tail;           // reference to the last node
 	
 	/**
 	 * 
 	 */
 	public MyLinkedList() {
 		head = null;
+		tail = null;
 		size = 0;
 	}
 
@@ -72,12 +74,11 @@ public class MyLinkedList<E> implements List<E> {
 	@Override
 	public boolean add(E element) {
 		if (head == null) {
-			head = new Node(element);
+		    head = new Node(element);
+		    tail = head;
 		} else {
-			Node node = head;
-			// loop until the last node
-			for ( ; node.next != null; node = node.next) {}
-			node.next = new Node(element);
+		    tail.next = new Node(element);
+		    tail = tail.next;
 		}
 		size++;
 		return true;
@@ -85,7 +86,20 @@ public class MyLinkedList<E> implements List<E> {
 
 	@Override
 	public void add(int index, E element) {
-		// TODO: fill this in
+	    // TODO: fill this in
+	    Node newNode = new Node(element);
+	    if (index == 0) {
+		newNode.next = head;
+		head = newNode;
+	    } else {
+		Node priorNode = getNode(index - 1);
+		newNode.next = priorNode.next;
+		priorNode.next = newNode;
+	    }
+	    if (newNode.next == null) {
+		tail = newNode;
+	    }
+	    size++;
 	}
 
 	@Override
@@ -105,6 +119,7 @@ public class MyLinkedList<E> implements List<E> {
 	@Override
 	public void clear() {
 		head = null;
+		tail = null;
 		size = 0;
 	}
 
@@ -146,8 +161,18 @@ public class MyLinkedList<E> implements List<E> {
 
 	@Override
 	public int indexOf(Object target) {
-		// TODO: fill this in
-		return -1;
+	    // TODO: fill this in
+	    int index = 0;
+	    Node node = head;
+	    if (node == null) return -1;
+	    while (node != null) {
+		if (equals(target, node.cargo)) {
+		    return index;
+		}
+		node = node.next;
+		index++;
+	    }
+	    return -1;
 	}
 
 	/** Checks whether an element of the array is the target.
@@ -201,8 +226,32 @@ public class MyLinkedList<E> implements List<E> {
 
 	@Override
 	public boolean remove(Object obj) {
-		// TODO: fill this in
-		return false;
+	    // TODO: fill this in
+	    Node node = head;
+	    if (node == null) return false;
+	    if (equals(obj, node.cargo)) {
+		head = node.next;
+		if (head == null) {
+		    tail = null;
+		}
+		size--;
+		return true;
+	    }
+	    Node prior = node;
+	    node = node.next;
+	    while (node != null) {
+		if (equals(obj, node.cargo)) {
+		    prior.next = node.next;
+		    if (prior.next == null) {
+			tail = prior;
+		    }
+		    size--;
+		    return true;
+		}
+		prior = node;
+		node = node.next;
+	    }
+	    return false;
 	}
 
 	@Override
@@ -210,9 +259,15 @@ public class MyLinkedList<E> implements List<E> {
 		E element = get(index);
 		if (index == 0) {
 			head = head.next;
+			if (head == null) {
+			    tail = null;
+			}
 		} else {
 			Node node = getNode(index-1);
 			node.next = node.next.next;
+			if (node.next == null) {
+			    tail = null;
+			}
 		}
 		size--;
 		return element;
@@ -247,19 +302,23 @@ public class MyLinkedList<E> implements List<E> {
 
 	@Override
 	public List<E> subList(int fromIndex, int toIndex) {
-		if (fromIndex < 0 || toIndex >= size || fromIndex > toIndex) {
-			throw new IndexOutOfBoundsException();
+	    if (fromIndex < 0 || toIndex >= size) {
+		throw new IndexOutOfBoundsException();
+	    }
+	    if (fromIndex > toIndex) {
+		// TODO: throw new IllegalArgumentException();
+		throw new IndexOutOfBoundsException();		
+	    }
+	    // TODO: classify this and improve it.
+	    int i = 0;
+	    MyLinkedList<E> list = new MyLinkedList<E>();
+	    for (Node node=head; node != null; node = node.next) {
+		if (i >= fromIndex && i < toIndex) {
+		    list.add(node.cargo);
 		}
-		// TODO: classify this and improve it.
-		int i = 0;
-		MyLinkedList<E> list = new MyLinkedList<E>();
-		for (Node node=head; node != null; node = node.next) {
-			if (i >= fromIndex && i <= toIndex) {
-				list.add(node.cargo);
-			}
-			i++;
-		}
-		return list;
+		i++;
+	    }
+	    return list;
 	}
 
 	@Override

@@ -285,7 +285,23 @@ public class MyLinkedListTest {
 	public void testSubList() {
 		mll.addAll(list);
 		List<Integer> sub = mll.subList(1, 4);
+		assertThat(sub.size(), is(3));
 		assertThat(sub.get(1), is(new Integer(3)));
+		sub = mll.subList(2, 2);
+		assertThat(sub.size(), is(0));
+		try {
+		    mll.subList(-1, 2);
+		    fail();
+		} catch (IndexOutOfBoundsException e) {} // good
+		try {
+		    mll.subList(1, 6);
+		    fail();
+		} catch (IndexOutOfBoundsException e) {} // good
+		try {
+		    mll.subList(3, 2);
+		    fail();
+		    // TODO: } catch (IllegalArgumentException e) {} // good
+		} catch (IndexOutOfBoundsException e) {} // good
 	}
 
 	/**
